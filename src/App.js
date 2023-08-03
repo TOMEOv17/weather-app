@@ -3,22 +3,29 @@ import axios from 'axios'
 import {useState, useEffect} from 'react'
 function App() {
   const [data, setData] = useState(),
+        [forecastData, setForecastData] = useState(),
         [city, setCity] = useState("Dallas"),
         [units, setUnits] = useState("metric")
   const key = "f5f6ec3eb55a2940c48cf4fdf1518485"
   const BASE_URL = `https://api.openweathermap.org/data/2.5/weather?&q=${city}&units=${units}&appid=${key}`
+  const FORECAST_URL = `https://api.openweathermap.org/data/2.5/forecast?&q=${city}&units=${units}&appid=${key}`
 
+  const currWeather = axios.get(BASE_URL)
+  const forecast = axios.get(FORECAST_URL)
 
   useEffect(() => {
-    axios.get(BASE_URL)
-      .then(res => setData(res.data))
+    currWeather.then(res => setData(res.data))
+    .catch(err => console.log(`An unexpected error has occured: ${err}`))
+    forecast.then(res => setForecastData(res.data))
+    .catch(err => console.log(`An unexpected error has occured: ${err}`))
   }, [])
-
 
   const fetchWeatherData = (e) => {
     if(e.key === "Enter"){
-      axios.get(BASE_URL)
-        .then(res => setData(res.data))
+        currWeather.then(res => setData(res.data))
+        .catch(err => console.log(`An unexpected error has occured: ${err}`))
+        
+        forecast.then(res => setForecastData(res.data))
         .catch(err => console.log(`An unexpected error has occured: ${err}`))
       }
   }
@@ -61,7 +68,16 @@ function App() {
         )}
       </div>
 
-      <div className="forecast"></div>
+      <div className="forecast">
+        {forecastData && forecastData.list.map(elem=>(
+          <div className="forecast_day" key={elem.dt}>
+            <p className='day'>{elem.dt_txt.slice(8, 9)}{elem.dt_txt.slice(9, 10)}</p>
+            <p>{elem.dt_txt.slice(10, 16)}</p>
+            <b>{elem.main.temp.toFixed(1)}{units==="metric" ? "°C" : "°F"}</b>
+            <p>{elem.weather[0].main}</p>
+          </div>
+        ))}
+      </div>
 
     </div>
   );
