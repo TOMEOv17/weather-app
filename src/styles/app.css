@@ -59,7 +59,7 @@ input{
     border: 2px solid white;
 }
 input:focus{
-    width: 50%;
+    width: 40%;
 }
 
 .overall{
@@ -96,4 +96,25 @@ input:focus{
 
 .day::first-letter{
     color: white;
+}
+
+button{
+    width: 100px;
+    position: absolute;
+    background-color: rgba(128, 128, 128, 0.432);
+    border: 2px solid white;
+    border-radius: 20px;
+    font-size: 1rem;
+    height: 50px;
+    transition: .3s;
+    cursor: pointer;
+}
+button:hover{
+    background-color: rgba(128, 128, 128, 0.76);
+}
+button:nth-of-type(1){
+    transform: translateX(20px) translateY(-40px);
+}
+button:nth-of-type(2){
+    transform: translateX(20px) translateY(25px);
 }

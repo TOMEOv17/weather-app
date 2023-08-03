@@ -9,15 +9,15 @@ function App() {
   const key = "f5f6ec3eb55a2940c48cf4fdf1518485"
   const BASE_URL = `https://api.openweathermap.org/data/2.5/weather?&q=${city}&units=${units}&appid=${key}`
   const FORECAST_URL = `https://api.openweathermap.org/data/2.5/forecast?&q=${city}&units=${units}&appid=${key}`
-
-  const currWeather = axios.get(BASE_URL)
-  const forecast = axios.get(FORECAST_URL)
+  let currWeather = axios.get(BASE_URL)
+  let forecast = axios.get(FORECAST_URL)
 
   useEffect(() => {
     currWeather.then(res => setData(res.data))
     .catch(err => console.log(`An unexpected error has occured: ${err}`))
     forecast.then(res => setForecastData(res.data))
     .catch(err => console.log(`An unexpected error has occured: ${err}`))
+
   }, [])
 
   const fetchWeatherData = (e) => {
@@ -34,22 +34,44 @@ function App() {
     setCity(e.target.value)
   }
 
+
+  const changeUnits = async (e) => {
+
+    if (e.target.innerHTML.toLowerCase() === units) return;
+    const newUnits = e.target.innerHTML.toLowerCase();
+    
+    try {
+      const currWeatherRes = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${newUnits}&appid=${key}`);
+      setData(currWeatherRes.data);
+
+      const forecastRes = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=${newUnits}&appid=${key}`);
+      setForecastData(forecastRes.data);
+
+      setUnits(newUnits);
+    } catch (err) {
+      console.log(`An unexpected error has occurred: ${err}`);
+    }
+
+  }
+
   return (
     <div className="app">
 
       <div className="current_weather">
         <input type="text" placeholder="Enter location..." onChange={cityUpdate} value={city} onKeyDown={fetchWeatherData}/>
+        <button onClick={changeUnits}>Metric</button>
+        <button onClick={changeUnits}>Imperial</button>
         {data && (
           <div className="overall">
             <p>{data.name}</p>
-            <h1>{data.main.temp}{units==="metric" ? "°C" : "°F"}</h1>
+            <h1>{data.main.temp.toFixed(1)}{units==="metric" ? "°C" : "°F"}</h1>
             <p>{data.weather[0].main}</p>
           </div>
         )}
         {data && (
           <div className="details">
             <div className="feels_like">
-              <b>{data.main.feels_like}{units==="metric" ? "°C" : "°F"}</b>
+              <b>{data.main.feels_like.toFixed(1)}{units==="metric" ? "°C" : "°F"}</b>
               <p>Feels Like</p>
             </div>
             <div className="humidity">
@@ -57,7 +79,7 @@ function App() {
               <p>Humidity</p>
             </div>
             <div className="wind_speed">
-              <b>{data.wind.speed} {units==="metric" ? "k/h" : "MPH"}</b>
+              <b>{data.wind.speed.toFixed(1)} {units==="metric" ? "km/h" : "MPH"}</b>
               <p>Wind Speed</p>
             </div>
             <div className="pressure">
