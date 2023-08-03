@@ -3,9 +3,10 @@ import axios from 'axios'
 import {useState, useEffect} from 'react'
 function App() {
   const [data, setData] = useState(),
-        [city, setCity] = useState("Dallas")
+        [city, setCity] = useState("Dallas"),
+        [units, setUnits] = useState("metric")
   const key = "f5f6ec3eb55a2940c48cf4fdf1518485"
-  const BASE_URL = `https://api.openweathermap.org/data/2.5/weather?&q=${city}&appid=${key}`
+  const BASE_URL = `https://api.openweathermap.org/data/2.5/weather?&q=${city}&units=${units}&appid=${key}`
 
 
   useEffect(() => {
@@ -18,6 +19,7 @@ function App() {
     if(e.key === "Enter"){
       axios.get(BASE_URL)
         .then(res => setData(res.data))
+        .catch(err => console.log(`An unexpected error has occured: ${err}`))
       }
   }
 
@@ -33,14 +35,14 @@ function App() {
         {data && (
           <div className="overall">
             <p>{data.name}</p>
-            <h1>{data.main.temp}°F</h1>
+            <h1>{data.main.temp}{units==="metric" ? "°C" : "°F"}</h1>
             <p>{data.weather[0].main}</p>
           </div>
         )}
         {data && (
           <div className="details">
             <div className="feels_like">
-              <b>{data.main.feels_like}°F</b>
+              <b>{data.main.feels_like}{units==="metric" ? "°C" : "°F"}</b>
               <p>Feels Like</p>
             </div>
             <div className="humidity">
@@ -48,7 +50,7 @@ function App() {
               <p>Humidity</p>
             </div>
             <div className="wind_speed">
-              <b>{data.wind.speed} MPH</b>
+              <b>{data.wind.speed} {units==="metric" ? "k/h" : "MPH"}</b>
               <p>Wind Speed</p>
             </div>
             <div className="pressure">
